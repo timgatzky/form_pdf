@@ -1,0 +1,13 @@
+
+<?php // edit styles here ?>
+<style type="text/css">
+p{font-size: 12px; font-family: sans-serif;}
+</style>
+
+<?php foreach($this->fields as $field => $value): ?>
+<?php // print fields ?>
+<p class="<?php echo $field; ?>>">
+<span class="label"><?php echo $field; ?>:</span>
+<span class="value"><?php echo $value; ?></span>
+</p>
+<?php endforeach; ?>
