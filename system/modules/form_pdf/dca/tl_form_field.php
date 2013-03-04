@@ -22,7 +22,7 @@ foreach($GLOBALS['TL_DCA']['tl_form_field']['palettes'] as $type => $palette)
 		continue;
 	}
 	
-	$palette .= '{form_pdf_legend:hide},pdf_hide;';
+	$palette .= ';{form_pdf_legend:hide},pdf_hide;';
 
 	$GLOBALS['TL_DCA']['tl_form_field']['palettes'][$type] = $palette;
 }
