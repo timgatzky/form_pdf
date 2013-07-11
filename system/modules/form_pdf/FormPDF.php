@@ -398,6 +398,7 @@ class FormPDF extends Backend
         elseif (version_compare(VERSION, '3.0', '>')) {
             //require_once(TL_ROOT . '/system/modules/core/vendor/swiftmailer/swift_required.php');
         }
+        else{}
 
 		$arrRecipients = array();
 		$arrSenders = array();
@@ -721,6 +722,7 @@ class FormPDF extends Backend
             require_once(TL_ROOT . '/system/modules/core/vendor/tcpdf/tcpdf.php');
             require_once(TL_ROOT . '/system/modules/core/vendor/tcpdf/include/tcpdf_colors.php');
         }
+        else{}
 
 		// Create new PDF document
 		$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true);
