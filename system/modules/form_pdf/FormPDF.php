@@ -386,8 +386,18 @@ class FormPDF extends Backend
 	protected function sendMail($arrSubmitted,$arrForm=null,$bolIsConfirmationMail=false)
 	{
 		// Include library
-		require_once(TL_ROOT.'/plugins/swiftmailer/swift_required.php');
-		
+        if (version_compare(VERSION, '2.11', '<='))
+        {
+            require_once(TL_ROOT.'/plugins/swiftmailer/swift_required.php');
+        }
+        elseif (version_compare(VERSION, '2.11', '>') && version_compare(VERSION, '3.1', '<'))
+        {
+            require_once(TL_ROOT . '/system/vendor/swiftmailer/swift_required.php');
+        }
+        elseif (version_compare(VERSION, '3.0', '>')) {
+            require_once(TL_ROOT . '/system/modules/core/vendor/swiftmailer/swift_required.php');
+        }
+
 		$arrRecipients = array();
 		$arrSenders = array();
 		$arrAttachments = array();
@@ -695,8 +705,21 @@ class FormPDF extends Backend
 
 		// Include library
 		require_once(TL_ROOT . '/system/config/tcpdf.php');
-		require_once(TL_ROOT . '/plugins/tcpdf/tcpdf.php');
-		require_once(TL_ROOT . '/plugins/tcpdf/htmlcolors.php');
+
+        if (version_compare(VERSION, '2.11', '<='))
+        {
+            require_once(TL_ROOT . '/plugins/tcpdf/tcpdf.php');
+            require_once(TL_ROOT . '/plugins/tcpdf/htmlcolors.php');
+        }
+        elseif (version_compare(VERSION, '2.11', '>') && version_compare(VERSION, '3.1', '<'))
+        {
+            require_once(TL_ROOT . '/system/vendor/tcpdf/tcpdf.php');
+            require_once(TL_ROOT . '/system/vendor/tcpdf/htmlcolors.php');
+        }
+        elseif (version_compare(VERSION, '3.0', '>')) {
+            require_once(TL_ROOT . '/system/modules/core/vendor/tcpdf/tcpdf.php');
+            require_once(TL_ROOT . '/system/modules/core/vendor/tcpdf/include/tcpdf_colors.php');
+        }
 
 		// Create new PDF document
 		$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true);
@@ -728,7 +751,13 @@ class FormPDF extends Backend
 		$pdf->setLanguageArray($l);
 
 		// Initialize document and add a page
-		$pdf->AliasNbPages();
+        if (version_compare(VERSION, '3.1', '<')) {
+		    $pdf->AliasNbPages();
+        }
+        else {
+            #$pdf->AliasNbPages();
+        }
+
 		$pdf->AddPage();
 
 		// Set font
