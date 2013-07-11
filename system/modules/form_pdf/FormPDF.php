@@ -188,8 +188,7 @@ class FormPDF extends Backend
 				
 			$filename = ($GLOBALS['FORM_PDF']['filename'] ? $GLOBALS['FORM_PDF']['filename'] : 'myPdf');
 			$filename = $this->replaceInsertTags($filename);
-            if (version_compare(VERSION, '2.11', '<=')) $path = ($GLOBALS['FORM_PDF']['path'] ? $GLOBALS['FORM_PDF']['path'].'/' : 'tl_files/');
-            else $path = ($GLOBALS['FORM_PDF']['path'] ? $GLOBALS['FORM_PDF']['path'].'/' : 'files/');
+            $path = ($GLOBALS['FORM_PDF']['path'] ? $GLOBALS['FORM_PDF']['path'].'/' : 'tl_files/');
 
 			// save file or send directely to the browser
 			if($arrForm['form_pdf_attachment'])
@@ -289,8 +288,7 @@ class FormPDF extends Backend
 			$filename = ($GLOBALS['FORM_PDF']['filename_confirmation'] ? $GLOBALS['FORM_PDF']['filename_confirmation'] : 'myPdf');
 			$filename = $this->replaceInsertTags($filename);
 
-            if (version_compare(VERSION, '2.11', '<=')) $path = ($GLOBALS['FORM_PDF']['path_confirmation'] ? $GLOBALS['FORM_PDF']['path_confirmation'].'/' : 'tl_files/');
-            else $path = ($GLOBALS['FORM_PDF']['path_confirmation'] ? $GLOBALS['FORM_PDF']['path_confirmation'].'/' : 'files/');
+            $path = ($GLOBALS['FORM_PDF']['path_confirmation'] ? $GLOBALS['FORM_PDF']['path_confirmation'].'/' : 'tl_files/');
 			
 			// save file or send directely to the browser
 			if($arrForm['form_pdf_attachment_confirmation'])
