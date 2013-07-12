@@ -188,16 +188,16 @@ class FormPDF extends Backend
 				
 			$filename = ($GLOBALS['FORM_PDF']['filename'] ? $GLOBALS['FORM_PDF']['filename'] : 'myPdf');
 			$filename = $this->replaceInsertTags($filename);
-			$path = ($GLOBALS['FORM_PDF']['path'] ? $GLOBALS['FORM_PDF']['path'].'/' : 'tl_files/');
-			
+            $path = ($GLOBALS['FORM_PDF']['path'] ? $GLOBALS['FORM_PDF']['path'].'/' : 'tl_files/');
+
 			// save file or send directely to the browser
-			if($arrForm['form_pdf_attachment_confirmation'])
+			if($arrForm['form_pdf_attachment'])
 			{
 				$strPdf = $this->printPDFtoFile($strHtml,$path,$filename,$GLOBALS['FORM_PDF']['uniqueFilename']);
 			}
 			else
 			{
-				$strPdf = $this->printPDFtoBrowser($strHtml,$filename);
+                $strPdf = $this->printPDFtoBrowser($strHtml,$filename);
 			}
 		
 			//-- store current path in Session for further use
@@ -287,7 +287,8 @@ class FormPDF extends Backend
 				
 			$filename = ($GLOBALS['FORM_PDF']['filename_confirmation'] ? $GLOBALS['FORM_PDF']['filename_confirmation'] : 'myPdf');
 			$filename = $this->replaceInsertTags($filename);
-			$path = ($GLOBALS['FORM_PDF']['path_confirmation'] ? $GLOBALS['FORM_PDF']['path_confirmation'].'/' : 'tl_files/');
+
+            $path = ($GLOBALS['FORM_PDF']['path_confirmation'] ? $GLOBALS['FORM_PDF']['path_confirmation'].'/' : 'tl_files/');
 			
 			// save file or send directely to the browser
 			if($arrForm['form_pdf_attachment_confirmation'])
@@ -333,7 +334,7 @@ class FormPDF extends Backend
 		
 		// Manually send the Email and redirect when using DOMPDF
 		// DOMPDF kills all contao routines executed afterwards. Strange!?
-		if($this->strPlugin == 'dompdf')
+		if($this->strPlugin == 'dompdf' || $this->strPlugin == 'tcpdf')
 		{
 			global $objPage;
 			
@@ -386,8 +387,19 @@ class FormPDF extends Backend
 	protected function sendMail($arrSubmitted,$arrForm=null,$bolIsConfirmationMail=false)
 	{
 		// Include library
-		require_once(TL_ROOT.'/plugins/swiftmailer/swift_required.php');
-		
+        if (version_compare(VERSION, '2.11', '<='))
+        {
+            require_once(TL_ROOT.'/plugins/swiftmailer/swift_required.php');
+        }
+        elseif (version_compare(VERSION, '2.11', '>') && version_compare(VERSION, '3.1', '<'))
+        {
+            require_once(TL_ROOT . '/system/vendor/swiftmailer/swift_required.php');
+        }
+        elseif (version_compare(VERSION, '3.0', '>')) {
+            //require_once(TL_ROOT . '/system/modules/core/vendor/swiftmailer/swift_required.php');
+        }
+        else{}
+
 		$arrRecipients = array();
 		$arrSenders = array();
 		$arrAttachments = array();
@@ -508,7 +520,7 @@ class FormPDF extends Backend
 		switch($this->strPlugin)
 		{
 		case 'tcpdf':
-			$pdf->Output($file.'.pdf', 'F');
+			$pdf->Output($file.'.pdf', 'F'); // F = save to a local server file with the name given by name.
 			break;
 		case 'dompdf':
 			// imports
@@ -551,7 +563,7 @@ class FormPDF extends Backend
 		switch($this->strPlugin)
 		{
 		case 'tcpdf':
-			$pdf->Output($file.'.pdf', 'D');
+			$pdf->Output($file.'.pdf', 'D'); // D = send to the browser and force a file download with the name given by name.
 			break;
 		case 'dompdf':
 
@@ -695,8 +707,22 @@ class FormPDF extends Backend
 
 		// Include library
 		require_once(TL_ROOT . '/system/config/tcpdf.php');
-		require_once(TL_ROOT . '/plugins/tcpdf/tcpdf.php');
-		require_once(TL_ROOT . '/plugins/tcpdf/htmlcolors.php');
+
+        if (version_compare(VERSION, '2.11', '<='))
+        {
+            require_once(TL_ROOT . '/plugins/tcpdf/tcpdf.php');
+            require_once(TL_ROOT . '/plugins/tcpdf/htmlcolors.php');
+        }
+        elseif (version_compare(VERSION, '2.11', '>') && version_compare(VERSION, '3.1', '<'))
+        {
+            require_once(TL_ROOT . '/system/vendor/tcpdf/tcpdf.php');
+            require_once(TL_ROOT . '/system/vendor/tcpdf/htmlcolors.php');
+        }
+        elseif (version_compare(VERSION, '3.0', '>')) {
+            require_once(TL_ROOT . '/system/modules/core/vendor/tcpdf/tcpdf.php');
+            require_once(TL_ROOT . '/system/modules/core/vendor/tcpdf/include/tcpdf_colors.php');
+        }
+        else{}
 
 		// Create new PDF document
 		$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true);
@@ -728,7 +754,13 @@ class FormPDF extends Backend
 		$pdf->setLanguageArray($l);
 
 		// Initialize document and add a page
-		$pdf->AliasNbPages();
+        if (version_compare(VERSION, '3.1', '<')) {
+		    $pdf->AliasNbPages();
+        }
+        else {
+            #$pdf->AliasNbPages();
+        }
+
 		$pdf->AddPage();
 
 		// Set font
