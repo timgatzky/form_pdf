@@ -39,7 +39,6 @@ class FormPDF extends Backend
 	public function replaceTags($strTags)
 	{
 		global $objPage;
-		$strReturn = '';
 		$elements = explode('::', $strTags);
 
 		switch (strtolower($elements[0]))
@@ -50,7 +49,7 @@ class FormPDF extends Backend
 					case 'file':
 						$this->import('Session');
 						$arrSession = $this->Session->get('form_pdf');
-						$strReturn = $arrSession['file'];		
+						return $arrSession['file'];		
 					break;
 					case 'link':
 						$this->import('Session');
@@ -60,21 +59,19 @@ class FormPDF extends Backend
 						$filename = basename($file);
 						$href = $this->replaceInsertTags('{{env::url}}') . '/' . $file;
 						
-						$strReturn = '<a href="'.$href.'" title="'.$filename.'">'.$filename.'</a>';
+						return '<a href="'.$href.'" title="'.$filename.'">'.$filename.'</a>';
 					break;
 					case 'link':
 						$this->import('Session');
 						$arrSession = $this->Session->get('form_pdf');
 						
 						$file = $arrSession['file'];
-						$href = $this->replaceInsertTags('{{env::url}}') . '/' . $file;
-						
-						$strReturn = $href;
+						return $this->replaceInsertTags('{{env::url}}') . '/' . $file;
 					break;
 					case 'file_confirmation':
 						$this->import('Session');
 						$arrSession = $this->Session->get('form_pdf');
-						$strReturn = $arrSession['file_confirmation'];		
+						return $arrSession['file_confirmation'];		
 					break;
 					case 'link_confirmation':
 						$this->import('Session');
@@ -84,7 +81,7 @@ class FormPDF extends Backend
 						$filename = basename($file);
 						$href = $this->replaceInsertTags('{{env::url}}') . '/' . $file;
 						
-						$strReturn = '<a href="'.$href.'" title="'.$filename.'">'.$filename.'</a>';
+						return '<a href="'.$href.'" title="'.$filename.'">'.$filename.'</a>';
 					break;
 					case 'link_url_confirmation':
 						$this->import('Session');
@@ -93,7 +90,7 @@ class FormPDF extends Backend
 						$file = $arrSession['file_confirmation'];
 						$href = $this->replaceInsertTags('{{env::url}}') . '/' . $file;
 						
-						$strReturn = $href;
+						return $href;
 					break;
 					default:
 						return false;
@@ -103,16 +100,15 @@ class FormPDF extends Backend
 			case 'form':
 		        if(isset($_SESSION['FORM_DATA'][$elements[1]])) 
 		        {
-		        	$strContent = $_SESSION['FORM_DATA'][$elements[1]];
-		        } 
+		        	return $_SESSION['FORM_DATA'][$elements[1]];
+		        }
+		        return false;
 	        break; 
 	        
 			default: 
 				return false;
 			break;
 		}
-		
-		return $strReturn;
 	}
 	
 		
@@ -424,8 +420,10 @@ class FormPDF extends Backend
 			// attachments
 			$arrAttachments = deserialize($arrForm['formattedMailAttachments']);
 			
-			// body and subjuct
+			// body and subject
 			$strText = $arrForm['formattedMailText'];
+			
+			
 			$strSubject = $arrForm['formattedMailSubject'];
 		}
 		// is confirmation mail
@@ -449,11 +447,38 @@ class FormPDF extends Backend
 			// attachments
 			$arrAttachments = deserialize($arrForm['confirmationMailAttachments']);
 			
-			// body and subjuct
+			// body and subject
 			$strText = $arrForm['confirmationMailText'];
 			$strSubject = $arrForm['confirmationMailSubject'];
 		}
 		
+		// check if a html template is set
+		$isHtml = false;
+		if($arrForm['formattedMailTemplate'])
+		{
+			if (version_compare(VERSION, '3.0', '>='))
+	        {
+	        	$objFilesModel = new \FilesModel();
+	        	$file = $objFilesModel->findMultipleByIds(array($arrForm['formattedMailTemplate']));
+	        	if($file->extension == 'html' || $file->extension == 'htm')
+				{
+					$objFile = new \File($file->path);	
+					$strText = $objFile->getContent();
+					$isHtml = true;
+				}
+	        }
+			else
+			{
+				// cannot use contao classes here
+				if (!file_exists(TL_ROOT . '/' . $arrForm['formattedMailTemplate']))
+				{
+					$isHtml = false;
+					break;
+				}
+				$strText = file_get_contents(TL_ROOT . '/' . $arrForm['formattedMailTemplate']);
+				$isHtml = true;
+			}
+		}		
 			
 		// Replace inserttags in text fields
 		$strText = $this->replaceInsertTags($strText);
@@ -473,6 +498,10 @@ class FormPDF extends Backend
 		
 		// Message
 		$objMessage->setBody($strText, 'text/plain'); // 'text/html'
+		if($isHtml)
+		{
+			$objMessage->setBody($strText, 'text/html');
+		}
 			
 		// Attachments
 		if(count($arrAttachments) > 0)
