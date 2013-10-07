@@ -454,12 +454,23 @@ class FormPDF extends Backend
 		
 		// check if a html template is set
 		$isHtml = false;
-		if($arrForm['formattedMailTemplate'])
+		
+		$arrHtmlTemplate = null;
+		if(!$bolIsConfirmationMail)
+		{
+			$arrHtmlTemplate = $arrForm['formattedMailTemplate'];
+		}
+		else
+		{
+			$arrHtmlTemplate = $arrForm['confirmationMailTemplate'];
+		}
+		
+		if($arrHtmlTemplate)
 		{
 			if (version_compare(VERSION, '3.0', '>='))
 	        {
 	        	$objFilesModel = new \FilesModel();
-	        	$file = $objFilesModel->findMultipleByIds(array($arrForm['formattedMailTemplate']));
+	        	$file = $objFilesModel->findMultipleByIds(array($arrHtmlTemplate));
 	        	if($file->extension == 'html' || $file->extension == 'htm')
 				{
 					$objFile = new \File($file->path);	
@@ -470,15 +481,15 @@ class FormPDF extends Backend
 			else
 			{
 				// cannot use contao classes here
-				if (!file_exists(TL_ROOT . '/' . $arrForm['formattedMailTemplate']))
+				if (!file_exists(TL_ROOT . '/' . $arrHtmlTemplate))
 				{
 					$isHtml = false;
 					break;
 				}
-				$strText = file_get_contents(TL_ROOT . '/' . $arrForm['formattedMailTemplate']);
+				$strText = file_get_contents(TL_ROOT . '/' . $arrHtmlTemplate);
 				$isHtml = true;
 			}
-		}		
+		}	
 			
 		// Replace inserttags in text fields
 		$strText = $this->replaceInsertTags($strText);
