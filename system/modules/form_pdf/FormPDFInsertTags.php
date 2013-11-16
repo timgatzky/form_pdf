@@ -22,7 +22,6 @@ class FormPDFInsertTags extends \Controller
 	 */
 	public function replaceTags($strTags)
 	{
-		global $objPage;
 		$elements = explode('::', $strTags);
 
 		switch (strtolower($elements[0]))
@@ -31,14 +30,11 @@ class FormPDFInsertTags extends \Controller
 				switch($elements[1])
 				{
 					case 'file':
-						$this->import('Session');
-						$arrSession = $this->Session->get('form_pdf');
+						$arrSession = \Session::getInstance()->get('form_pdf');
 						return $arrSession['file'];		
 					break;
 					case 'link':
-						$this->import('Session');
-						$arrSession = $this->Session->get('form_pdf');
-						
+						$arrSession = \Session::getInstance()->get('form_pdf');
 						$file = $arrSession['file'];
 						$filename = basename($file);
 						$href = $this->replaceInsertTags('{{env::url}}') . '/' . $file;
@@ -46,21 +42,16 @@ class FormPDFInsertTags extends \Controller
 						return '<a href="'.$href.'" title="'.$filename.'">'.$filename.'</a>';
 					break;
 					case 'link':
-						$this->import('Session');
-						$arrSession = $this->Session->get('form_pdf');
-						
+						$arrSession = \Session::getInstance()->get('form_pdf');
 						$file = $arrSession['file'];
 						return $this->replaceInsertTags('{{env::url}}') . '/' . $file;
 					break;
 					case 'file_confirmation':
-						$this->import('Session');
-						$arrSession = $this->Session->get('form_pdf');
+						$arrSession = \Session::getInstance()->get('form_pdf');
 						return $arrSession['file_confirmation'];		
 					break;
 					case 'link_confirmation':
-						$this->import('Session');
-						$arrSession = $this->Session->get('form_pdf');
-						
+						$arrSession = \Session::getInstance()->get('form_pdf');
 						$file = $arrSession['file_confirmation'];
 						$filename = basename($file);
 						$href = $this->replaceInsertTags('{{env::url}}') . '/' . $file;
@@ -68,9 +59,7 @@ class FormPDFInsertTags extends \Controller
 						return '<a href="'.$href.'" title="'.$filename.'">'.$filename.'</a>';
 					break;
 					case 'link_url_confirmation':
-						$this->import('Session');
-						$arrSession = $this->Session->get('form_pdf');
-						
+						$arrSession = \Session::getInstance()->get('form_pdf');
 						$file = $arrSession['file_confirmation'];
 						$href = $this->replaceInsertTags('{{env::url}}') . '/' . $file;
 						
@@ -82,10 +71,12 @@ class FormPDFInsertTags extends \Controller
 				}
 			break;
 			case 'form':
-		        if(isset($_SESSION['FORM_DATA'][$elements[1]])) 
-		        {
-		        	return $_SESSION['FORM_DATA'][$elements[1]];
-		        }
+				$objInput = \Input::getInstance();
+				$var = ( $objInput->post($elements[1]) ? $objInput->post($elements[1]) : $objInput->get($elements[1]) );
+				if(strlen($var) > 0)
+				{
+				    return $var;
+				}
 		        return false;
 	        break; 
 	        
