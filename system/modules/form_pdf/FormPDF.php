@@ -5,33 +5,48 @@
  *
  * Copyright (C) 2005-2012 Leo Feyer
  *
- * @copyright Tim Gatzky 2012
- * @author  Tim Gatzky <info@tim-gatzky.de>
- * @package  form_pdf
- * @link  http://contao.org
- * @license  http://www.gnu.org/licenses/lgpl-3.0.html LGPL
+ * @copyright 	Tim Gatzky 2012
+ * @author  	Tim Gatzky <info@tim-gatzky.de>
+ * @package  	form_pdf
+ * @link  		http://contao.org
+ * @license  	http://www.gnu.org/licenses/lgpl-3.0.html LGPL
  */
 
-class FormPDF extends Backend
+class FormPDF extends \Backend
 {
 	/**
-	 * @var
+	 * Default Template
+	 * @var string
 	 */
 	protected $strTemplate = 'form_pdf_example';
 
 	/**
-	 * @var
+	 * Default plugin
+	 * @var string
 	 */
 	protected $strPlugin = 'dompdf';
 
 	/**
-	 * @var
+	 * @var boolean
 	 */
 	protected $bolIsConfirmation = false;
 	
-	
-	
+	/**
+	 * 
+	 */
+	public function processFormData($arrPost, $arrForm, $arrFiles)
+	{
+		if(!$arrForm['form_pdf'] && !$arrForm['form_pdf_confirmation'])
+		{
+			return $arrPost;
+		}
 		
+		$arrForm['formattedMailRecipient'] = $arrForm['recipient'];
+		$arrForm['formattedMailSubject'] = $arrForm['subject'];
+		
+		$this->processEfgFormData($arrPost, $arrFiles, 0, $arrForm);
+	}
+	
 	/**
 	 * Generate a pdf file from a template html file and attach to email
 	 * @param array
@@ -50,6 +65,11 @@ class FormPDF extends Backend
 		// set pdf plugin
 		$this->strPlugin = $arrForm['form_pdf_plugin'];
 		
+		if(!$this->strPlugin)
+		{
+			return $arrSubmitted;
+		}
+		
 		//-- generate pdf and attach
 		$filename = '';
 		$path = '';
@@ -67,13 +87,15 @@ class FormPDF extends Backend
 			$arrFields = $arrSubmitted;
 			unset($arrFields['FORM_SUBMIT']);
 			unset($arrFields['MAX_FILE_SIZE']);
+			unset($arrFields['REQUEST_TOKEN']);
 	
 			// unset fields with pdf_hide = 1
+			$objDatabase = \Database::getInstance();
 			foreach($arrFields as $field => $v)
 			{
-				$objFormField = $this->Database->prepare("SELECT pdf_hide FROM tl_form_field WHERE pid=? AND name=?")
-				->limit(1)
-				->execute($arrForm['id'], $field);
+				$objFormField = $objDatabase->prepare("SELECT pdf_hide FROM tl_form_field WHERE pid=? AND name=?")
+											->limit(1)
+											->execute($arrForm['id'], $field);
 				
 				if($objFormField->numRows > 0 && $objFormField->pdf_hide > 0)
 				{
@@ -92,7 +114,7 @@ class FormPDF extends Backend
 			}
 			
 			// output template
-			$objTemplate = new FrontendTemplate($this->strTemplate);
+			$objTemplate = new \FrontendTemplate($this->strTemplate);
 			$objTemplate->setData($this->arrData);
 			$objTemplate->submitted = $arrSubmitted;
 			$objTemplate->form = $arrForm;
@@ -116,12 +138,12 @@ class FormPDF extends Backend
 			{
                 $strPdf = $this->printPDFtoBrowser($strHtml,$filename);
 			}
-		
+			
 			//-- store current path in Session for further use
-			$this->import('Session');
-			$arrSession = $this->Session->get('form_pdf');
+			$objSession = \Session::getInstance();
+			$arrSession = $objSession->get('form_pdf');
 			$arrSession = array('file'=>$strPdf);
-			$this->Session->set('form_pdf',$arrSession);
+			$objSession->set('form_pdf',$arrSession);
 			//--
 			
 			//-- attachments
@@ -191,7 +213,7 @@ class FormPDF extends Backend
 			}
 			
 			// output template
-			$objTemplate = new FrontendTemplate($this->strTemplate);
+			$objTemplate = new \FrontendTemplate($this->strTemplate);
 			$objTemplate->setData($this->arrData);
 			$objTemplate->submitted = $arrSubmitted;
 			$objTemplate->form = $arrForm;
@@ -219,10 +241,10 @@ class FormPDF extends Backend
 			}
 		
 			//-- store current path in Session for further use
-			$this->import('Session');
-			$arrSession = $this->Session->get('form_pdf');
+			$objSession = \Session::getInstance();
+			$arrSession = $objSession->get('form_pdf');
 			$arrSession = array('file_confirmation'=>$strPdf);
-			$this->Session->set('form_pdf',$arrSession);
+			$objSession->set('form_pdf',$arrSession);
 			//--
 			
 			//-- confirmation attachments
@@ -254,16 +276,17 @@ class FormPDF extends Backend
 		if($this->strPlugin == 'dompdf' || $this->strPlugin == 'tcpdf')
 		{
 			global $objPage;
+			$objJumpTo = null;
 			
 			// set jump to page
 			if($arrForm['jumpTo'] > 0)
 			{
-				$objPage = $this->Database->prepare("SELECT * FROM tl_page WHERE id=?")
-				->limit(1)
-				->execute($arrForm['jumpTo']);
+				$objDatabase = \Database::getInstance();
+				$objJumpTo = $objDatabase->prepare("SELECT * FROM tl_page WHERE id=?")->limit(1)->execute($arrForm['jumpTo']);
 			}
+			
 			// redirect url
-			$redirect = $this->generateFrontendUrl($objPage->row());
+			$redirect = $this->generateFrontendUrl($objJumpTo->row());
 			
 			// send mail
 			if($arrForm['sendFormattedMail'])
@@ -288,7 +311,6 @@ class FormPDF extends Backend
 			}
 			
 			$this->redirect($redirect);
-			
 		}
 		
 		return $arrSubmitted;
@@ -342,7 +364,6 @@ class FormPDF extends Backend
 			
 			// body and subject
 			$strText = $arrForm['formattedMailText'];
-			
 			
 			$strSubject = $arrForm['formattedMailSubject'];
 		}
@@ -416,8 +437,8 @@ class FormPDF extends Backend
 		$strSubject = $this->replaceInsertTags($strSubject);
 		
 		//-- build mail
-		$objMailer = new Swift_Mailer(new Swift_MailTransport());
-		$objMessage = Swift_Message::newInstance();
+		$objMailer = new \Swift_Mailer(new \Swift_MailTransport());
+		$objMessage = \Swift_Message::newInstance();
 		
 		$objMessage->setSubject($strSubject); // Message subject
 		
@@ -602,7 +623,7 @@ class FormPDF extends Backend
 		else
 		{
 			// add hook here for other plugins
-			throw new Exception('No PDF render plugin selected');
+			throw new \Exception('No PDF render plugin selected');
 		}
 
 		// HOOK: allow individual PDF routines before printing
@@ -684,7 +705,7 @@ class FormPDF extends Backend
         else{}
 
 		// Create new PDF document
-		$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true);
+		$pdf = new \TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true);
 
 		// Set document information
 		$pdf->SetCreator(PDF_CREATOR);
