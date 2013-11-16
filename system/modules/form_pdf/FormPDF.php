@@ -32,7 +32,10 @@ class FormPDF extends \Backend
 	protected $bolIsConfirmation = false;
 	
 	/**
-	 * 
+	 * Start the pdf creation without the efg extension
+	 * @param array
+	 * @param array
+	 * @param array
 	 */
 	public function processFormData($arrPost, $arrForm, $arrFiles)
 	{
@@ -41,6 +44,7 @@ class FormPDF extends \Backend
 			return $arrPost;
 		}
 		
+		// mimic efg fields
 		$arrForm['formattedMailRecipient'] = $arrForm['recipient'];
 		$arrForm['formattedMailSubject'] = $arrForm['subject'];
 		
