@@ -330,7 +330,7 @@ class FormPDF extends Backend
 		//--
 		
 		// Manually send the Email and redirect when using DOMPDF
-		// DOMPDF kills all contao routines executed afterwards. Strange!?
+		// DOMPDF kills all contao routines executed afterwards.
 		if($this->strPlugin == 'dompdf' || $this->strPlugin == 'tcpdf')
 		{
 			global $objPage;
@@ -559,25 +559,25 @@ class FormPDF extends Backend
 		// output pdf and save
 		switch($this->strPlugin)
 		{
-		case 'tcpdf':
-			$pdf->Output($file.'.pdf', 'F'); // F = save to a local server file with the name given by name.
-			break;
-		case 'dompdf':
-			// imports
-
-			// render pdf
-			$pdf->render();
-			$strBuffer = ltrim($pdf->output(array("compress" => 0)));
-			
-			// store data local
-			$this->pdf_content = $strBuffer;
-			
-			file_put_contents($file.'.pdf', $strBuffer);
-
-			break;
-		default:
-			// add HOOK for custom rendering plugin routines here
-			break;
+			case 'tcpdf':
+				$pdf->Output($file.'.pdf', 'F'); // F = save to a local server file with the name given by name.
+				break;
+			case 'dompdf':
+				// imports
+	
+				// render pdf
+				$pdf->render();
+				$strBuffer = ltrim($pdf->output(array("compress" => 0)));
+				
+				// store data local
+				$this->pdf_content = $strBuffer;
+				
+				file_put_contents($file.'.pdf', $strBuffer);
+	
+				break;
+			default:
+				// add HOOK for custom rendering plugin routines here
+				break;
 		}
 
 
@@ -602,18 +602,18 @@ class FormPDF extends Backend
 		// output pdf and send to browser
 		switch($this->strPlugin)
 		{
-		case 'tcpdf':
-			$pdf->Output($file.'.pdf', 'D'); // D = send to the browser and force a file download with the name given by name.
-			break;
-		case 'dompdf':
-
-			// render pdf
-			$pdf->render();
-			$pdf->stream($file.'.pdf', array("Attachment" => 1));
-			break;
-		default:
-			// add HOOK for custom rendering plugin routines here
-			break;
+			case 'tcpdf':
+				$pdf->Output($file.'.pdf', 'D'); // D = send to the browser and force a file download with the name given by name.
+				break;
+			case 'dompdf':
+	
+				// render pdf
+				$pdf->render();
+				$pdf->stream($file.'.pdf', array("Attachment" => 1));
+				break;
+			default:
+				// add HOOK for custom rendering plugin routines here
+				break;
 		}
 
 		return $file.'.pdf';
@@ -676,9 +676,9 @@ class FormPDF extends Backend
 			$pdf = $this->generatePDF_TCPDF($strHtml);
 		}
 		else if($strPlugin == 'dompdf')
-			{
-				$pdf = $this->generatePDF_DOMPDF($strHtml);
-			}
+		{
+			$pdf = $this->generatePDF_DOMPDF($strHtml);
+		}
 		else
 		{
 			// add hook here for other plugins
@@ -712,7 +712,7 @@ class FormPDF extends Backend
 		{
 			require_once(TL_ROOT . '/system/config/dompdf.php');
 		}
-		require_once(TL_ROOT . '/plugins/dompdf/dompdf_config.inc.php');
+		require_once(TL_ROOT.'/'.$GLOBALS['FORM_PDF']['dompdf_path'].'/dompdf_config.inc.php');
 
 		// Create new object
 		$pdf = new DOMPDF();
@@ -743,7 +743,6 @@ class FormPDF extends Backend
 		$l['a_meta_charset'] = $GLOBALS['TL_CONFIG']['characterSet'];
 		$l['a_meta_language'] = $GLOBALS['TL_LANGUAGE'];
 		$l['w_page'] = 'page';
-
 
 		// Include library
 		require_once(TL_ROOT . '/system/config/tcpdf.php');
