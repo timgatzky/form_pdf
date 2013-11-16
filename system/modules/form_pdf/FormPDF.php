@@ -126,7 +126,7 @@ class FormPDF extends Backend
 		{
 			return $arrSubmitted;
 		}
-
+		
 		// set pdf plugin
 		$this->strPlugin = $arrForm['form_pdf_plugin'];
 		
@@ -177,6 +177,7 @@ class FormPDF extends Backend
 			$objTemplate->submitted = $arrSubmitted;
 			$objTemplate->form = $arrForm;
 			$objTemplate->fields = $arrFields;
+			$objTemplate->files = $arrFiles;
 	
 			// generate template
 			$strHtml = $objTemplate->parse();
@@ -203,7 +204,7 @@ class FormPDF extends Backend
 			$this->Session->set('form_pdf',$arrSession);
 			//--
 			
-			//-- confirmation attachments
+			//-- attachments
 			if($arrForm['form_pdf_attachment'])
 			{
 				$arrConfirmationAttachments = deserialize($arrForm['formattedMailAttachments']);
@@ -227,7 +228,6 @@ class FormPDF extends Backend
 	
 		}
 		//--
-		
 		
 		//-- generate confirmation pdf and attach
 		$filename = '';
@@ -276,6 +276,7 @@ class FormPDF extends Backend
 			$objTemplate->submitted = $arrSubmitted;
 			$objTemplate->form = $arrForm;
 			$objTemplate->fields = $arrFields;
+			$objTemplate->files = $arrFiles;
 	
 			// generate template
 			$strHtml = $objTemplate->parse();
@@ -369,8 +370,7 @@ class FormPDF extends Backend
 			$this->redirect($redirect);
 			
 		}
-
-
+		
 		return $arrSubmitted;
 	}
 	
@@ -513,7 +513,7 @@ class FormPDF extends Backend
 		{
 			$objMessage->setBody($strText, 'text/html');
 		}
-			
+		
 		// Attachments
 		if(count($arrAttachments) > 0)
 		{
