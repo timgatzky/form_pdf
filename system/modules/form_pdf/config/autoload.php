@@ -16,7 +16,8 @@
  */
 ClassLoader::addClasses(array
 (
-	'FormPDF' => 'system/modules/form_pdf/FormPDF.php',
+	'FormPDF' 				=> 'system/modules/form_pdf/FormPDF.php',
+	'FormPDFInsertTags' 	=> 'system/modules/form_pdf/FormPDFInsertTags.php',
 ));
 
 
