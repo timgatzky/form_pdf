@@ -1,4 +1,4 @@
-<?php if (!defined('TL_ROOT')) die('You can not access this file directly!');
+<?php
 /**
  * Contao
  * German translation file
@@ -21,5 +21,3 @@ $GLOBALS['TL_LANG']['tl_form_field']['pdf_hide'] = array('In PDF verstecken','WÃ
  * Legends
  */
 $GLOBALS['TL_LANG']['tl_form_field']['form_pdf_legend'] = 'PDF Einstellungen';
-
-?>

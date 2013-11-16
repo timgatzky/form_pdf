@@ -1,4 +1,4 @@
-<?php if (!defined('TL_ROOT')) die('You can not access this file directly!');
+<?php
 /**
  * Contao
  * German translation file
@@ -21,8 +21,3 @@ $GLOBALS['TL_LANG']['tl_form']['form_pdf_attachment']		= array('Als Anhang verse
 $GLOBALS['TL_LANG']['tl_form']['form_pdf_plugin']			= array('PDF Plugin','Bitte wählen Sie das Plugin, das zu Erstellung des PDFs verwendet werden soll.');
 $GLOBALS['TL_LANG']['tl_form']['form_pdf_plugin']['tcpdf'] 	= array('TCPDF');
 $GLOBALS['TL_LANG']['tl_form']['form_pdf_plugin']['dompdf'] = array('DOMPDF');
-/**
- * Legends
- */
-
-?>
