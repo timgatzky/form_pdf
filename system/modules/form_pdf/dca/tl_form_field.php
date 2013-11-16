@@ -35,5 +35,6 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['pdf_hide'] = array
 	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['pdf_hide'],
 	'exclude'                 => true,
 	'inputType'               => 'checkbox',
-	'eval'					  => array('tl_class'=>'clr')
+	'eval'					  => array('tl_class'=>'clr'),
+	'sql'					  => "char(1) NOT NULL default '0'",
 );
