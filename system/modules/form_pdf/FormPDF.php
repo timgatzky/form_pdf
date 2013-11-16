@@ -1,4 +1,4 @@
-<?php if (!defined('TL_ROOT')) die('You can not access this file directly!');
+<?php
 
 /**
  * Contao Open Source CMS
@@ -30,86 +30,6 @@ class FormPDF extends Backend
 	protected $bolIsConfirmation = false;
 	
 	
-	/**
-	 * Replace Insert Tags
-	 * @param string
-	 * @return mixed
-	 * called from parseInsertTags HOOK
-	 */
-	public function replaceTags($strTags)
-	{
-		global $objPage;
-		$elements = explode('::', $strTags);
-
-		switch (strtolower($elements[0]))
-		{
-			case 'form_pdf':
-				switch($elements[1])
-				{
-					case 'file':
-						$this->import('Session');
-						$arrSession = $this->Session->get('form_pdf');
-						return $arrSession['file'];		
-					break;
-					case 'link':
-						$this->import('Session');
-						$arrSession = $this->Session->get('form_pdf');
-						
-						$file = $arrSession['file'];
-						$filename = basename($file);
-						$href = $this->replaceInsertTags('{{env::url}}') . '/' . $file;
-						
-						return '<a href="'.$href.'" title="'.$filename.'">'.$filename.'</a>';
-					break;
-					case 'link':
-						$this->import('Session');
-						$arrSession = $this->Session->get('form_pdf');
-						
-						$file = $arrSession['file'];
-						return $this->replaceInsertTags('{{env::url}}') . '/' . $file;
-					break;
-					case 'file_confirmation':
-						$this->import('Session');
-						$arrSession = $this->Session->get('form_pdf');
-						return $arrSession['file_confirmation'];		
-					break;
-					case 'link_confirmation':
-						$this->import('Session');
-						$arrSession = $this->Session->get('form_pdf');
-						
-						$file = $arrSession['file_confirmation'];
-						$filename = basename($file);
-						$href = $this->replaceInsertTags('{{env::url}}') . '/' . $file;
-						
-						return '<a href="'.$href.'" title="'.$filename.'">'.$filename.'</a>';
-					break;
-					case 'link_url_confirmation':
-						$this->import('Session');
-						$arrSession = $this->Session->get('form_pdf');
-						
-						$file = $arrSession['file_confirmation'];
-						$href = $this->replaceInsertTags('{{env::url}}') . '/' . $file;
-						
-						return $href;
-					break;
-					default:
-						return false;
-					break;
-				}
-			break;
-			case 'form':
-		        if(isset($_SESSION['FORM_DATA'][$elements[1]])) 
-		        {
-		        	return $_SESSION['FORM_DATA'][$elements[1]];
-		        }
-		        return false;
-	        break; 
-	        
-			default: 
-				return false;
-			break;
-		}
-	}
 	
 		
 	/**
@@ -126,7 +46,7 @@ class FormPDF extends Backend
 		{
 			return $arrSubmitted;
 		}
-
+		
 		// set pdf plugin
 		$this->strPlugin = $arrForm['form_pdf_plugin'];
 		
@@ -177,6 +97,7 @@ class FormPDF extends Backend
 			$objTemplate->submitted = $arrSubmitted;
 			$objTemplate->form = $arrForm;
 			$objTemplate->fields = $arrFields;
+			$objTemplate->files = $arrFiles;
 	
 			// generate template
 			$strHtml = $objTemplate->parse();
@@ -203,7 +124,7 @@ class FormPDF extends Backend
 			$this->Session->set('form_pdf',$arrSession);
 			//--
 			
-			//-- confirmation attachments
+			//-- attachments
 			if($arrForm['form_pdf_attachment'])
 			{
 				$arrConfirmationAttachments = deserialize($arrForm['formattedMailAttachments']);
@@ -227,7 +148,6 @@ class FormPDF extends Backend
 	
 		}
 		//--
-		
 		
 		//-- generate confirmation pdf and attach
 		$filename = '';
@@ -276,6 +196,7 @@ class FormPDF extends Backend
 			$objTemplate->submitted = $arrSubmitted;
 			$objTemplate->form = $arrForm;
 			$objTemplate->fields = $arrFields;
+			$objTemplate->files = $arrFiles;
 	
 			// generate template
 			$strHtml = $objTemplate->parse();
@@ -329,7 +250,7 @@ class FormPDF extends Backend
 		//--
 		
 		// Manually send the Email and redirect when using DOMPDF
-		// DOMPDF kills all contao routines executed afterwards. Strange!?
+		// DOMPDF kills all contao routines executed afterwards.
 		if($this->strPlugin == 'dompdf' || $this->strPlugin == 'tcpdf')
 		{
 			global $objPage;
@@ -369,8 +290,7 @@ class FormPDF extends Backend
 			$this->redirect($redirect);
 			
 		}
-
-
+		
 		return $arrSubmitted;
 	}
 	
@@ -454,12 +374,23 @@ class FormPDF extends Backend
 		
 		// check if a html template is set
 		$isHtml = false;
-		if($arrForm['formattedMailTemplate'])
+		
+		$arrHtmlTemplate = null;
+		if(!$bolIsConfirmationMail)
+		{
+			$arrHtmlTemplate = $arrForm['formattedMailTemplate'];
+		}
+		else
+		{
+			$arrHtmlTemplate = $arrForm['confirmationMailTemplate'];
+		}
+		
+		if($arrHtmlTemplate)
 		{
 			if (version_compare(VERSION, '3.0', '>='))
 	        {
 	        	$objFilesModel = new \FilesModel();
-	        	$file = $objFilesModel->findMultipleByIds(array($arrForm['formattedMailTemplate']));
+	        	$file = $objFilesModel->findMultipleByIds(array($arrHtmlTemplate));
 	        	if($file->extension == 'html' || $file->extension == 'htm')
 				{
 					$objFile = new \File($file->path);	
@@ -470,15 +401,15 @@ class FormPDF extends Backend
 			else
 			{
 				// cannot use contao classes here
-				if (!file_exists(TL_ROOT . '/' . $arrForm['formattedMailTemplate']))
+				if (!file_exists(TL_ROOT . '/' . $arrHtmlTemplate))
 				{
 					$isHtml = false;
 					break;
 				}
-				$strText = file_get_contents(TL_ROOT . '/' . $arrForm['formattedMailTemplate']);
+				$strText = file_get_contents(TL_ROOT . '/' . $arrHtmlTemplate);
 				$isHtml = true;
 			}
-		}		
+		}	
 			
 		// Replace inserttags in text fields
 		$strText = $this->replaceInsertTags($strText);
@@ -502,7 +433,7 @@ class FormPDF extends Backend
 		{
 			$objMessage->setBody($strText, 'text/html');
 		}
-			
+		
 		// Attachments
 		if(count($arrAttachments) > 0)
 		{
@@ -548,25 +479,25 @@ class FormPDF extends Backend
 		// output pdf and save
 		switch($this->strPlugin)
 		{
-		case 'tcpdf':
-			$pdf->Output($file.'.pdf', 'F'); // F = save to a local server file with the name given by name.
-			break;
-		case 'dompdf':
-			// imports
-
-			// render pdf
-			$pdf->render();
-			$strBuffer = ltrim($pdf->output(array("compress" => 0)));
-			
-			// store data local
-			$this->pdf_content = $strBuffer;
-			
-			file_put_contents($file.'.pdf', $strBuffer);
-
-			break;
-		default:
-			// add HOOK for custom rendering plugin routines here
-			break;
+			case 'tcpdf':
+				$pdf->Output($file.'.pdf', 'F'); // F = save to a local server file with the name given by name.
+				break;
+			case 'dompdf':
+				// imports
+	
+				// render pdf
+				$pdf->render();
+				$strBuffer = ltrim($pdf->output(array("compress" => 0)));
+				
+				// store data local
+				$this->pdf_content = $strBuffer;
+				
+				file_put_contents($file.'.pdf', $strBuffer);
+	
+				break;
+			default:
+				// add HOOK for custom rendering plugin routines here
+				break;
 		}
 
 
@@ -591,18 +522,18 @@ class FormPDF extends Backend
 		// output pdf and send to browser
 		switch($this->strPlugin)
 		{
-		case 'tcpdf':
-			$pdf->Output($file.'.pdf', 'D'); // D = send to the browser and force a file download with the name given by name.
-			break;
-		case 'dompdf':
-
-			// render pdf
-			$pdf->render();
-			$pdf->stream($file.'.pdf', array("Attachment" => 1));
-			break;
-		default:
-			// add HOOK for custom rendering plugin routines here
-			break;
+			case 'tcpdf':
+				$pdf->Output($file.'.pdf', 'D'); // D = send to the browser and force a file download with the name given by name.
+				break;
+			case 'dompdf':
+	
+				// render pdf
+				$pdf->render();
+				$pdf->stream($file.'.pdf', array("Attachment" => 1));
+				break;
+			default:
+				// add HOOK for custom rendering plugin routines here
+				break;
 		}
 
 		return $file.'.pdf';
@@ -665,9 +596,9 @@ class FormPDF extends Backend
 			$pdf = $this->generatePDF_TCPDF($strHtml);
 		}
 		else if($strPlugin == 'dompdf')
-			{
-				$pdf = $this->generatePDF_DOMPDF($strHtml);
-			}
+		{
+			$pdf = $this->generatePDF_DOMPDF($strHtml);
+		}
 		else
 		{
 			// add hook here for other plugins
@@ -701,7 +632,7 @@ class FormPDF extends Backend
 		{
 			require_once(TL_ROOT . '/system/config/dompdf.php');
 		}
-		require_once(TL_ROOT . '/plugins/dompdf/dompdf_config.inc.php');
+		require_once(TL_ROOT.'/'.$GLOBALS['FORM_PDF']['dompdf_path'].'/dompdf_config.inc.php');
 
 		// Create new object
 		$pdf = new DOMPDF();
@@ -732,7 +663,6 @@ class FormPDF extends Backend
 		$l['a_meta_charset'] = $GLOBALS['TL_CONFIG']['characterSet'];
 		$l['a_meta_language'] = $GLOBALS['TL_LANGUAGE'];
 		$l['w_page'] = 'page';
-
 
 		// Include library
 		require_once(TL_ROOT . '/system/config/tcpdf.php');
