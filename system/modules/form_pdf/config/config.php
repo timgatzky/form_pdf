@@ -19,6 +19,7 @@ if(in_array('efg', $this->getActiveModules()))
 }
 else
 {
+	array_insert($GLOBALS['TL_HOOKS']['processFormData'],count($GLOBALS['TL_HOOKS']['processFormData']),array(array('FormPDF','processFormData')));
 }
 
 /**
@@ -30,13 +31,15 @@ $GLOBALS['TL_HOOKS']['replaceInsertTags'][] = array('FormPDFInsertTags', 'replac
 /**
  * Globals
  */
-$GLOBALS['FORM_PDF']['path'] = 'tl_files';
+$GLOBALS['FORM_PDF']['path'] = 'files';
 $GLOBALS['FORM_PDF']['filename'] = 'MyPDF';
-$GLOBALS['FORM_PDF']['path_confirmation'] = 'tl_files';
+$GLOBALS['FORM_PDF']['path_confirmation'] = 'files';
 $GLOBALS['FORM_PDF']['filename_confirmation'] = 'MyConfirmationPDF';
 $GLOBALS['FORM_PDF']['uniqueFilename'] = false; // adds a timestamp to the filename when a file with the same name already exists
 $GLOBALS['FORM_PDF']['dompdf_path'] = 'assets/dompdf';
 if (version_compare(VERSION, '2.11', '<=') )
 {
 	$GLOBALS['FORM_PDF']['dompdf_path'] = 'plugins/dompdf';
+	$GLOBALS['FORM_PDF']['path'] = 'tl_files';
+	$GLOBALS['FORM_PDF']['path_confirmation'] = 'tl_files';
 }
