@@ -35,7 +35,6 @@ $GLOBALS['TL_DCA']['tl_form']['palettes'] = str_replace
 $GLOBALS['TL_DCA']['tl_form']['subpalettes']['form_pdf'] = 'form_pdf_template,form_pdf_attachment';
 $GLOBALS['TL_DCA']['tl_form']['subpalettes']['form_pdf_confirmation'] = 'form_pdf_template_confirmation,form_pdf_attachment_confirmation';
 
-
 /**
  * Fields
  */
