@@ -333,14 +333,11 @@ class FormPDF extends \Backend
         {
             require_once(TL_ROOT.'/plugins/swiftmailer/swift_required.php');
         }
-        elseif (version_compare(VERSION, '2.11', '>') && version_compare(VERSION, '3.1', '<'))
+        elseif (version_compare(VERSION, '3.0', '>='))
         {
             require_once(TL_ROOT . '/system/vendor/swiftmailer/swift_required.php');
         }
-        elseif (version_compare(VERSION, '3.0', '>')) {
-            //require_once(TL_ROOT . '/system/modules/core/vendor/swiftmailer/swift_required.php');
-        }
-        else{}
+       else{}
 
 		$arrRecipients = array();
 		$arrSenders = array();
