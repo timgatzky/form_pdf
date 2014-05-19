@@ -328,9 +328,6 @@ class FormPDF extends \Backend
 	 */
 	protected function sendMail($arrSubmitted,$arrForm=null,$bolIsConfirmationMail=false)
 	{
-		// Include library
-        require_once(TL_ROOT.'/'.$GLOBALS['FORM_PDF']['swiftmailer']);
-        
 		$arrRecipients = array();
 		$arrSenders = array();
 		$arrAttachments = array();
@@ -430,7 +427,46 @@ class FormPDF extends \Backend
 		$strSubject = $this->replaceInsertTags($strSubject);
 		
 		//-- build mail
-		$objMailer = new \Swift_Mailer(new \Swift_MailTransport());
+		if (version_compare(VERSION, '3.1', '>='))
+		{
+			$objEmail = new \Email();
+			$objEmail->__set('from', implode(',',$arrSenders));
+			#$objEmail->fromName = $GLOBALS['TL_ADMIN_NAME'];
+			#$objEmail->replyTo = $GLOBALS['TL_ADMIN_EMAIL'];
+			$objEmail->subject = $strSubject;			
+			
+			if($isHtml)
+			{
+				$objEmail->__set('html',$strText);
+			}
+			else
+			{
+				$objEmail->__set('text',$strText);
+			}
+			
+			// Attachments
+			if(count($arrAttachments) > 0)
+			{
+				foreach($arrAttachments as $file)
+				{
+					$objEmail->attachFile($file);
+				}
+			}
+			
+			if($objEmail->sendTo(implode(',', $arrRecipients)))
+			{
+				return true;
+			}
+		
+			return false;
+		}
+		
+		// ---- Backwards compatibility from here ----
+		
+		// Include library
+        require_once(TL_ROOT.'/'.$GLOBALS['FORM_PDF']['swiftmailer']);
+        
+        $objMailer = new \Swift_Mailer(new \Swift_MailTransport());
 		$objMessage = \Swift_Message::newInstance();
 		
 		$objMessage->setSubject($strSubject); // Message subject
