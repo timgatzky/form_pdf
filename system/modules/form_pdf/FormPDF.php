@@ -329,16 +329,8 @@ class FormPDF extends \Backend
 	protected function sendMail($arrSubmitted,$arrForm=null,$bolIsConfirmationMail=false)
 	{
 		// Include library
-        if (version_compare(VERSION, '2.11', '<='))
-        {
-            require_once(TL_ROOT.'/plugins/swiftmailer/swift_required.php');
-        }
-        elseif (version_compare(VERSION, '3.0', '>='))
-        {
-            require_once(TL_ROOT . '/system/vendor/swiftmailer/swift_required.php');
-        }
-       else{}
-
+        require_once(TL_ROOT.'/'.$GLOBALS['FORM_PDF']['swiftmailer']);
+        
 		$arrRecipients = array();
 		$arrSenders = array();
 		$arrAttachments = array();

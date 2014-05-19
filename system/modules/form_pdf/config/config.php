@@ -37,9 +37,16 @@ $GLOBALS['FORM_PDF']['path_confirmation'] = 'files';
 $GLOBALS['FORM_PDF']['filename_confirmation'] = 'MyConfirmationPDF';
 $GLOBALS['FORM_PDF']['uniqueFilename'] = false; // adds a timestamp to the filename when a file with the same name already exists
 $GLOBALS['FORM_PDF']['dompdf_path'] = 'assets/dompdf';
+$GLOBALS['FORM_PDF']['swiftmailer'] = 'vendor/swiftmailer/swiftmailer/lib/swift_required.php';
+if (version_compare(VERSION, '3.0', '>=') && version_compare(VERSION, '3.2', '<='))
+{
+	$GLOBALS['FORM_PDF']['swiftmailer'] = 'system/core/vendor/swiftmailer/swift_required.php';
+}
+
 if (version_compare(VERSION, '2.11', '<=') )
 {
 	$GLOBALS['FORM_PDF']['dompdf_path'] = 'plugins/dompdf';
 	$GLOBALS['FORM_PDF']['path'] = 'tl_files';
 	$GLOBALS['FORM_PDF']['path_confirmation'] = 'tl_files';
+	$GLOBALS['FORM_PDF']['swiftmailer'] = '/plugins/swiftmailer/swift_required.php';
 }
