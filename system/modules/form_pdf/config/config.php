@@ -13,7 +13,7 @@
  */
 
 // make sure its the last hook processed
-if(in_array('efg', $this->getActiveModules()))
+if(in_array('efg', $this->getActiveModules()) || in_array('efg', \Config::getInstance()->getActiveModules() ))
 {
 	array_insert($GLOBALS['TL_HOOKS']['processEfgFormData'],count($GLOBALS['TL_HOOKS']['processEfgFormData']),array(array('FormPDF','processEfgFormData')));
 }
