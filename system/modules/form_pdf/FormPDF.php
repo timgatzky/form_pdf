@@ -280,7 +280,7 @@ class FormPDF extends \Backend
 		if($this->strPlugin == 'dompdf' || $this->strPlugin == 'tcpdf')
 		{
 			global $objPage;
-			$objJumpTo = null;
+			$objJumpTo = $objPage;
 			
 			// set jump to page
 			if($arrForm['jumpTo'] > 0)
