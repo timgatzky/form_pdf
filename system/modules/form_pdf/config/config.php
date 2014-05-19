@@ -13,7 +13,7 @@
  */
 
 // make sure its the last hook processed
-if(in_array('efg', $this->getActiveModules()))
+if(in_array('efg', $this->getActiveModules()) || in_array('efg', \Config::getInstance()->getActiveModules() ))
 {
 	array_insert($GLOBALS['TL_HOOKS']['processEfgFormData'],count($GLOBALS['TL_HOOKS']['processEfgFormData']),array(array('FormPDF','processEfgFormData')));
 }
@@ -42,4 +42,9 @@ if (version_compare(VERSION, '2.11', '<=') )
 	$GLOBALS['FORM_PDF']['dompdf_path'] = 'plugins/dompdf';
 	$GLOBALS['FORM_PDF']['path'] = 'tl_files';
 	$GLOBALS['FORM_PDF']['path_confirmation'] = 'tl_files';
+	$GLOBALS['FORM_PDF']['swiftmailer'] = '/plugins/swiftmailer/swift_required.php';
+}
+else if (version_compare(VERSION, '3.0', '>=') && version_compare(VERSION, '3.1', '<'))
+{
+	$GLOBALS['FORM_PDF']['swiftmailer'] = 'system/modules/core/vendor/swiftmailer/swift_required.php';
 }
