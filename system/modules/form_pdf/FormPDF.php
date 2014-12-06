@@ -314,7 +314,7 @@ class FormPDF extends \Backend
 				}
 			}
 			
-			$this->redirect($redirect);
+			#$this->redirect($redirect);
 		}
 		
 		return $arrSubmitted;
