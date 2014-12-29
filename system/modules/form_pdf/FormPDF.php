@@ -731,6 +731,10 @@ class FormPDF extends \Backend
             require_once(TL_ROOT . '/system/modules/core/vendor/tcpdf/tcpdf.php');
             require_once(TL_ROOT . '/system/modules/core/vendor/tcpdf/include/tcpdf_colors.php');
         }
+        elseif (version_compare(VERSION, '3.3', '>=')) {
+			require_once(TL_ROOT . '/vendor/tecnick.com/tcpdf/tcpdf.php');
+		}
+		
         else{}
 
 		// Create new PDF document
