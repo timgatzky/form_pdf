@@ -33,7 +33,7 @@ $GLOBALS['TL_DCA']['tl_form']['palettes'] = str_replace
  * Subpalettes
  */
 $GLOBALS['TL_DCA']['tl_form']['subpalettes']['form_pdf'] = 'form_pdf_template,form_pdf_attachment,form_pdf_paper';
-$GLOBALS['TL_DCA']['tl_form']['subpalettes']['form_pdf_confirmation'] = 'form_pdf_template_confirmation,form_pdf_attachment_confirmation,form_pdf_paper';
+$GLOBALS['TL_DCA']['tl_form']['subpalettes']['form_pdf_confirmation'] = 'form_pdf_template_confirmation,form_pdf_attachment_confirmation,form_pdf_confirmation';
 
 /**
  * Fields
@@ -106,6 +106,17 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['form_pdf_plugin'] = array
 );
 
 $GLOBALS['TL_DCA']['tl_form']['fields']['form_pdf_paper'] = array
+(
+	'label'					  => &$GLOBALS['TL_LANG']['tl_form']['form_pdf_paper'],
+	'exclude'                 => true,
+	'inputType'               => 'select',
+	'default'				  => 'A4',
+	'options'				  => $GLOBALS['FORM_PDF']['papers'] ?: array('A3'),
+	'eval'                    => array('tl_class'=>'w50 clr','chosen'=>true),
+	'sql'					  => "varchar(32) NOT NULL default ''",
+);
+
+$GLOBALS['TL_DCA']['tl_form']['fields']['form_pdf_paper_confirmation'] = array
 (
 	'label'					  => &$GLOBALS['TL_LANG']['tl_form']['form_pdf_paper'],
 	'exclude'                 => true,

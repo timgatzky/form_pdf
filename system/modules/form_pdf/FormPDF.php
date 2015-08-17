@@ -201,6 +201,12 @@ class FormPDF extends \Backend
 		{
 			$this->bolIsConfirmation = true;
 			
+			// set paper size
+			if(strlen($arrForm['form_pdf_pager_confirmation']) > 0)
+			{
+				$this->strPaper = $arrForm['form_pdf_pager_confirmation'];
+			}
+			
 			//-- get path to template file and write template
 			$pdf_template = $arrForm['form_pdf_template_confirmation'];
 			if($this->strTemplate != $pdf_template)
