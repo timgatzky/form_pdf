@@ -1,3 +1,4 @@
 ### 1.0.5
+Added: Select the paper size. Defined by $GLOBALS['FORM_PDF']['papers']
 Update: Update DOMPDF to version 0.5.2
 Update: Changed /plugins folder to /assets folder
