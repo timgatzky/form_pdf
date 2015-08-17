@@ -25,11 +25,18 @@ class FormPDF extends \Backend
 	 * @var string
 	 */
 	protected $strPlugin = 'dompdf';
-
+	
 	/**
 	 * @var boolean
 	 */
 	protected $bolIsConfirmation = false;
+	
+	/**
+	 * Paper size
+	 * @var string
+	 */
+	protected $strPaper = 'a4';
+	
 	
 	/**
 	 * Start the pdf creation without the efg extension
@@ -47,6 +54,12 @@ class FormPDF extends \Backend
 		// mimic efg fields
 		$arrForm['formattedMailRecipient'] = $arrForm['recipient'];
 		$arrForm['formattedMailSubject'] = $arrForm['subject'];
+		
+		// set paper size
+		if(strlen($arrForm['form_pdf_pager']) > 0)
+		{
+			$this->strPaper = $arrForm['form_pdf_pager'];
+		}
 		
 		$this->processEfgFormData($arrPost, $arrFiles, 0, $arrForm);
 	}
@@ -80,6 +93,12 @@ class FormPDF extends \Backend
 		if($arrForm['form_pdf'])
 		{
 			$this->bolIsConfirmation = false;
+			
+			// set paper size
+			if(strlen($arrForm['form_pdf_pager']) > 0)
+			{
+				$this->strPaper = $arrForm['form_pdf_pager'];
+			}
 			
 			//-- get path to template file and write template
 			$pdf_template = $arrForm['form_pdf_template'];
@@ -654,7 +673,7 @@ class FormPDF extends \Backend
 			// add hook here for other plugins
 			throw new \Exception('No PDF render plugin selected');
 		}
-
+		
 		// HOOK: allow individual PDF routines before printing
 		if (isset($GLOBALS['TL_HOOKS']['generatePdf']) && count($GLOBALS['TL_HOOKS']['generatePdf']) > 0)
 		{
@@ -688,7 +707,7 @@ class FormPDF extends \Backend
 		$pdf = new DOMPDF();
 
 		// Set paper size
-		$pdf->set_paper('a4');
+		$pdf->set_paper( strtolower($this->strPaper) ?: 'a4' );
 
 		// Set path
 		$pdf->set_base_path(TL_ROOT);
@@ -738,7 +757,10 @@ class FormPDF extends \Backend
         else{}
 
 		// Create new PDF document
-		$pdf = new \TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true);
+		
+		$paper = $this->strPaper ?: PDF_PAGE_FORMAT;
+		
+		$pdf = new \TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, $paper, true);
 
 		// Set document information
 		$pdf->SetCreator(PDF_CREATOR);

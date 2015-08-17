@@ -21,3 +21,4 @@ $GLOBALS['TL_LANG']['tl_form']['form_pdf_attachment']		= array('Als Anhang verse
 $GLOBALS['TL_LANG']['tl_form']['form_pdf_plugin']			= array('PDF Plugin','Bitte wählen Sie das Plugin, das zu Erstellung des PDFs verwendet werden soll.');
 $GLOBALS['TL_LANG']['tl_form']['form_pdf_plugin']['tcpdf'] 	= array('TCPDF');
 $GLOBALS['TL_LANG']['tl_form']['form_pdf_plugin']['dompdf'] = array('DOMPDF');
+$GLOBALS['TL_LANG']['tl_form']['form_pdf_paper'] 			= array('Blattformat','Bitte wählen Sie das Format. Weiter Formate können über die Globale: $GLOBALS["FORM_PDF"]["papers"] ergänzt werden.');

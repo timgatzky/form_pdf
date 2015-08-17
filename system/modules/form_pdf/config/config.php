@@ -48,3 +48,4 @@ else if (version_compare(VERSION, '3.0', '>=') && version_compare(VERSION, '3.1'
 {
 	$GLOBALS['FORM_PDF']['swiftmailer'] = 'system/modules/core/vendor/swiftmailer/swift_required.php';
 }
+$GLOBALS['FORM_PDF']['papers'] = array('A3','A4');
