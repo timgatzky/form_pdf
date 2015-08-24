@@ -703,12 +703,12 @@ class FormPDF extends \Backend
 	protected function generatePDF_DOMPDF($strHtml)
 	{
 		// Include library
+		require_once(TL_ROOT.'/'.$GLOBALS['FORM_PDF']['dompdf_path'].'/dompdf_config.inc.php');
 		if(file_exists(TL_ROOT . '/system/config/dompdf.php'))
 		{
 			require_once(TL_ROOT . '/system/config/dompdf.php');
 		}
-		require_once(TL_ROOT.'/'.$GLOBALS['FORM_PDF']['dompdf_path'].'/dompdf_config.inc.php');
-
+		
 		// Create new object
 		$pdf = new DOMPDF();
 
